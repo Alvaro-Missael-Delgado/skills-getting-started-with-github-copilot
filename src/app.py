@@ -1,3 +1,5 @@
+# ...existing code...
+
 """
 High School Management System API
 
@@ -40,74 +42,22 @@ activities = {
         "participants": ["john@mergington.edu", "olivia@mergington.edu"]
     },
 
-    # Sports-related activities
-    "Soccer Team": {
-        "description": "Outdoor team practice and inter-school matches",
-        "schedule": "Mondays and Wednesdays, 4:00 PM - 6:00 PM",
-        "max_participants": 22,
-        "participants": ["liam@mergington.edu", "ava@mergington.edu"]
-    },
-    "Track and Field": {
-        "description": "Sprints, distance running, jumps and throws training",
-        "schedule": "Tuesdays and Thursdays, 4:00 PM - 5:30 PM",
-        "max_participants": 25,
-        "participants": ["noah@mergington.edu", "mia@mergington.edu"]
-    },
-
-    # Artistic activities
-    "Art Club": {
-        "description": "Drawing, painting, and mixed-media workshops",
-        "schedule": "Wednesdays, 3:30 PM - 5:00 PM",
-        "max_participants": 18,
-        "participants": ["isabella@mergington.edu", "lucas@mergington.edu"]
-    },
-    "Drama Club": {
-        "description": "Acting, script work, and stage productions",
-        "schedule": "Fridays, 4:00 PM - 6:00 PM",
-        "max_participants": 20,
-        "participants": ["amelia@mergington.edu", "ethan@mergington.edu"]
-    },
-
-    # Intellectual activities
-    "Debate Team": {
-        "description": "Prepare for debate tournaments and practice public speaking",
-        "schedule": "Tuesdays, 5:00 PM - 6:30 PM",
-        "max_participants": 16,
-        "participants": ["william@mergington.edu", "evelyn@mergington.edu"]
-    },
-    "Science Club": {
-        "description": "Hands-on experiments, projects, and science fairs",
-        "schedule": "Thursdays, 3:30 PM - 5:00 PM",
-        "max_participants": 20,
-        "participants": ["james@mergington.edu", "charlotte@mergington.edu"]
-    }
+    # ...existing activities dictionary...
 }
 
-
-@app.get("/")
-def root():
-    return RedirectResponse(url="/static/index.html")
-
-
-@app.get("/activities")
-def get_activities():
-    return activities
-
-
-@app.post("/activities/{activity_name}/signup")
-def signup_for_activity(activity_name: str, email: str):
-    """Sign up a student for an activity"""
+# Unregister endpoint (remove participant from activity)
+@app.post("/activities/{activity_name}/unregister")
+def unregister_from_activity(activity_name: str, email: str):
+    """Remove a student from an activity"""
     # Validate activity exists
     if activity_name not in activities:
         raise HTTPException(status_code=404, detail="Activity not found")
 
-    # Get the specific activity
     activity = activities[activity_name]
 
-    # Validate student is not already signed up
-    if email in activity["participants"]:
-        raise HTTPException(status_code=400, detail="Student already signed up for this activity")
+    # Validate student is signed up
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=400, detail="Student not registered for this activity")
 
-    # Add student
-    activity["participants"].append(email)
-    return {"message": f"Signed up {email} for {activity_name}"}
+    activity["participants"].remove(email)
+    return {"message": f"Unregistered {email} from {activity_name}"}
